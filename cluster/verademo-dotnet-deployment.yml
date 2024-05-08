@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: verademo-dotnet
+  labels:
+    app: verademo-dotnet
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: verademo-dotnet
+  template:
+    metadata:
+      labels:
+        app: verademo-dotnet
+    spec:
+      containers:
+      - name: verademo-dotnet
+        image: veracode/vulnerable-verademo-dotnet
+        ports:
+        - containerPort: 8080

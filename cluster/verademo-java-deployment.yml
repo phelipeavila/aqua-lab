@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: verademo-java-web
+  labels:
+    app: verademo-java-web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: verademo-java-web
+  template:
+    metadata:
+      labels:
+        app: verademo-java-web
+    spec:
+      containers:
+      - name: verademo-java-web
+        image: veracode/vulnerable-verademo-java
+        ports:
+        - containerPort: 8080
