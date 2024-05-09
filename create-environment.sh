@@ -107,7 +107,7 @@ create_kind_cluster() {
         # Configure kubeconfig
         echo "--> Configuring kubeconfig..."
         mkdir -p ~/.kube
-        sudo kind get kubeconfig --name=aqua-env > ~/.kube/config || { echo "Failed to configure kubeconfig"; exit 1; }
+        sudo kind get kubeconfig --name="$cluster_name" > ~/.kube/config || { echo "Failed to configure kubeconfig"; exit 1; }
     fi
 
     # Apply Kubernetes manifests
@@ -132,3 +132,39 @@ echo "--> Installation completed successfully."
 create_kind_cluster
 echo "--> Configuration completed successfully."
 
+
+echo "--> Adding Aquasec to Helm repository."
+helm repo add aqua-helm https://helm.aquasec.com
+helm repo update
+
+# Function to get user input with validation
+get_user_input() {
+  local prompt="$1"
+  local is_password="$2"  # Optional flag for password input (hidden)
+
+  local value=""
+  while [ -z "$value" ]; do
+    read ${is_password:+-s} -rep "$prompt" value
+    if [ -z "$value" ]; then
+      echo "Input cannot be empty. Please try again."
+    fi
+  done
+  echo "$value"
+}
+
+# Get username
+username=$(get_user_input $'\nPlease enter your Registry username:\n')
+
+# Get password (using the function with password flag)
+password=$(get_user_input $'\nPlease enter your Registry password:\n' -s)
+
+# Get Helm command
+helm_command=$(get_user_input $'\nPlease enter the Helm command:\n')
+
+# Replace placeholders in the command
+helm_command="${helm_command/<registry-username>/$username}"
+helm_command="${helm_command/<registry-password>/$password}"
+
+# Execute the final helm command
+echo -e "\n---\n"
+echo "$helm_command"
